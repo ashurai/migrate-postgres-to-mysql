@@ -3,7 +3,7 @@ Use this script to migrate Postgres to MySQL database with Data
 PostgreSQL to MySQL Migration Guide
 This guide provides instructions on migrating a PostgreSQL database to MySQL, including the necessary steps for exporting the schema, converting it to MySQL format, and importing data.
 
-Prerequisites
+**Prerequisites**
 Before starting the migration, ensure you have the following:
 
 * PostgreSQL and MySQL installed and accessible on your system.
@@ -48,7 +48,7 @@ Here’s an example of how a PostgreSQL schema looks and how it should be modifi
 
 PostgreSQL Schema (Sample):
 sql
-Copy
+```
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -68,18 +68,21 @@ CREATE TABLE products (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+```
 3. Create the MySQL Database
 Ensure that the target MySQL database exists. If it doesn't, create it using the following command:
 
 bash
-Copy
+```
 mysql -u mysql_user -p -e "CREATE DATABASE IF NOT EXISTS your_mysql_db;"
+```
 4. Import the MySQL-Compatible Schema
 Once the schema is converted, import it into MySQL using the following command:
 
 bash
-Copy
+```
 mysql -u mysql_user -p your_mysql_db < your_mysql_dump.sql
+```
 This command will create the tables in MySQL based on the converted schema from PostgreSQL.
 
 5. Export Data from PostgreSQL in CSV Format
@@ -88,26 +91,29 @@ Next, you need to export the data from each table in PostgreSQL into CSV format.
 For each table, use the COPY command:
 
 sql
-Copy
+```
 COPY products TO '/path/to/export/products.csv' DELIMITER ',' CSV HEADER;
+```
 You can script this for all tables in the PostgreSQL database. Use the following query to get a list of all tables:
 
 sql
-Copy
+```
 SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';
+```
 Then, export the data from each table using the COPY command.
 
 6. Import Data into MySQL
 Once you have exported the data from PostgreSQL into CSV files, you can import each CSV file into MySQL using the LOAD DATA LOCAL INFILE command.
 
 sql
-Copy
+```
 LOAD DATA LOCAL INFILE '/path/to/export/products.csv'
 INTO TABLE products
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
+```
 Repeat this for each table, adjusting the table name and file path accordingly.
 
 7. Adjust for Foreign Keys and Constraints
@@ -123,9 +129,10 @@ Ensure views are converted and work properly in MySQL.
 Once the schema and data have been successfully migrated, and you've tested everything, you can clean up any exported files (e.g., CSVs, SQL dumps) if you wish.
 
 bash
-Copy
+```
 rm -rf /path/to/export/
-Troubleshooting
+```
+**Troubleshooting**
 Character Encoding: Ensure that the character encoding of both the PostgreSQL and MySQL databases match, especially if you are working with special characters. UTF-8 is commonly used.
 
 Data Type Differences: Some data types in PostgreSQL may require more complex transformations (e.g., BYTEA, UUID). Make sure to adjust these data types manually.
